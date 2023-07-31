@@ -1,2 +1,4 @@
-requests
-Flask
+requests~=2.31.0
+Flask~=2.3.2
+bson~=0.5.10
+pymongo~=4.4.1

@@ -1,14 +1,15 @@
+import os
 from typing import List, Tuple
 
-from api.server_api.utils.exceptions import ArticleNotFoundException, NoSimilarArticlesException, \
+from db_driver import get_current_db_driver, DBConsts
+from db_driver.db_objects.article import Article
+from db_driver.db_objects.cluster import Cluster
+from db_utils.article_utils import ArticleUtils
+from db_utils.cluster_utils import ClusterUtils
+from logger import get_current_logger
+from server_api.utils.exceptions import ArticleNotFoundException, NoSimilarArticlesException, \
     GetSimilarArticlesException
-from api.server_api.objects.article_api_data import ArticleApiData
-from server_utils.db_driver import get_current_db_driver
-from server_utils.db_driver.db_objects.article import Article
-from server_utils.db_driver.db_objects.cluster import Cluster
-from server_utils.logger import get_current_logger
-from server_utils.db_utils.article_utils import ArticleUtils
-from server_utils.db_utils.cluster_utils import ClusterUtils
+from server_api.objects.article_api_data import ArticleApiData
 
 
 class APILogic:
