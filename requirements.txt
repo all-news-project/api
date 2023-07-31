@@ -3,3 +3,4 @@ Flask==2.2.5
 bson~=0.5.10
 pymongo~=4.4.1
 gunicorn==19.7.1
+schedule~=1.2.0

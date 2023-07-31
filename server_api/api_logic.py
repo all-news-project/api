@@ -1,7 +1,6 @@
-import os
 from typing import List, Tuple
 
-from db_driver import get_current_db_driver, DBConsts
+from db_driver import get_current_db_driver
 from db_driver.db_objects.article import Article
 from db_driver.db_objects.cluster import Cluster
 from db_utils.article_utils import ArticleUtils
