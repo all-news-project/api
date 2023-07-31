@@ -1,6 +1,6 @@
 import os
 
-from api.server_api import app
+from server_api import app
 
 if __name__ == '__main__':
     HOST = os.getenv(key="HOST", default="0.0.0.0")
