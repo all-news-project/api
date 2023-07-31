@@ -1,0 +1,8 @@
+.idea/*
+venv/
+*_pids.txt
+__pycache__
+*/integration/server_api_build/
+*.tar
+*/integration/image_id.txt
+backup/
