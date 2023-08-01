@@ -14,7 +14,6 @@ from server_api.objects.article_api_data import ArticleApiData
 class APILogic:
     def __init__(self):
         self.server_logger = get_current_logger(task_type="api logic")
-        self._db = get_current_db_driver()
         self._article_utils = ArticleUtils()
         self._cluster_utils = ClusterUtils()
 
