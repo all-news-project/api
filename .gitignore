@@ -2,7 +2,7 @@
 venv/
 *_pids.txt
 __pycache__
-*/integration/server_api_build/
+integration/server_api_build/
+integration/image_id.txt
 *.tar
-*/integration/image_id.txt
 backup/

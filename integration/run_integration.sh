@@ -34,10 +34,10 @@ cp Dockerfile server_api_build
 cp requirements.txt server_api_build
 
 # Server utils
-cp -r ../../server_utils server_api_build
+cp -r ../../server_utils/* server_api_build
 
 # Get version as tag
-version=$(cat ../../version.txt)
+version=$(cat ../version.txt)
 
 # Build docker
 docker build -t server_api:"$version" server_api_build

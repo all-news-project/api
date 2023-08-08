@@ -1,10 +1,10 @@
 from typing import List, Tuple
 
-from db_driver import get_current_db_driver
 from db_driver.db_objects.article import Article
 from db_driver.db_objects.cluster import Cluster
 from db_utils.article_utils import ArticleUtils
 from db_utils.cluster_utils import ClusterUtils
+from db_utils.media_utils import MediaUtils
 from logger import get_current_logger
 from server_api.utils.exceptions import ArticleNotFoundException, NoSimilarArticlesException, \
     GetSimilarArticlesException
@@ -16,6 +16,7 @@ class APILogic:
         self.server_logger = get_current_logger(task_type="api logic")
         self._article_utils = ArticleUtils()
         self._cluster_utils = ClusterUtils()
+        self._media_utils = MediaUtils()
 
     def get_similar_articles_data(self, article_url: str) -> Tuple[List[ArticleApiData], str]:
         """
@@ -51,6 +52,11 @@ class APILogic:
             # Collect needed articles data
             self.server_logger.info(f"Got {len(articles)} similar articles")
             for index, article in enumerate(articles):
+
+                # The same article the client is currently reading
+                if article.url == article_url:
+                    continue
+
                 self.server_logger.debug(f"({index + 1}) Article data: `{str(article)}`")
                 article_api_object = self.__get_convert_article_api_data(article=article)
                 similar_articles.append(article_api_object)
@@ -60,12 +66,13 @@ class APILogic:
             raise GetSimilarArticlesException(desc)
         return similar_articles, title
 
-    @staticmethod
-    def __get_convert_article_api_data(article: Article) -> ArticleApiData:
+    def __get_convert_article_api_data(self, article: Article) -> ArticleApiData:
         article_data = {
             "title": article.title,
-            "domain": article.domain,
-            "url": article.url
+            "media": article.media,
+            "url": article.url,
+            "icon_url": self._media_utils.get_google_article_icon_url(article.media),
+            "publishing_time": article.publishing_time
         }
         article_api_object = ArticleApiData(**article_data)
         return article_api_object
