@@ -16,7 +16,7 @@ def index():
 @app.route('/get_similar_articles', methods=['GET'])
 def get_similar_articles():
     logger = get_current_logger()
-    logger.debug(f"Try getting similar articles"),
+    logger.debug(f"Try getting similar articles")
     return_data = {"articles_data": list(), "error_msg": "", "succeeded": False, "title": ""}
     if 'url' not in request.args:
         return_data["error_msg"] = ServerApiConsts.MSG_URL_REQUIRED
@@ -37,7 +37,60 @@ def get_similar_articles():
         except GetSimilarArticlesException:
             return_data["error_msg"] = ServerApiConsts.MSG_GETTING_SIMILAR_ARTICLES
         except Exception as e:
-            logger.debug(str(e))
+            logger.error(str(e))
 
     logger.info(f"(get_similar_articles) return data: `{return_data}`")
+    return return_data
+
+
+@app.route('/get_clusters_for_ui', methods=['GET'])
+def get_clusters_for_ui():
+    logger = get_current_logger()
+    logger.debug(f"Try getting clusters for ui")
+    return_data = {"nodes": list(), "edges": list(), "succeeded": False}
+    try:
+        api_logic = APILogic()
+        nodes, edges = api_logic.build_clusters_for_ui()
+        return_data["nodes"] = nodes
+        return_data["edges"] = edges
+        return_data["succeeded"] = True
+    except Exception as e:
+        logger.error(str(e))
+
+    logger.info(f"(get_similar_articles) return data: `{return_data}`")
+    return return_data
+
+
+@app.route('/get_websites_stats', methods=['GET'])
+def get_websites_stats():
+    logger = get_current_logger()
+    logger.debug(f"Try getting websites statistic data for ui")
+    return_data = {"values": list(), "labels": list(), "succeeded": False}
+    try:
+        api_logic = APILogic()
+        values, labels = api_logic.get_websites_stats()
+        return_data["values"] = values
+        return_data["labels"] = labels
+        return_data["succeeded"] = True
+    except Exception as e:
+        logger.error(str(e))
+
+    logger.info(f"(get_websites_stats) return data: `{return_data}`")
+    return return_data
+
+
+@app.route('/get_db_stats', methods=['GET'])
+def get_db_stats():
+    logger = get_current_logger()
+    logger.debug(f"Try getting db statistic data for ui")
+    return_data = {"data": dict(), "succeeded": False}
+    try:
+        api_logic = APILogic()
+        data = api_logic.get_db_stats()
+        return_data["data"] = data
+        return_data["succeeded"] = True
+    except Exception as e:
+        logger.error(str(e))
+
+    logger.info(f"(get_db_stats) return data: `{return_data}`")
     return return_data
