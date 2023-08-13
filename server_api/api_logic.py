@@ -23,7 +23,7 @@ class APILogic:
         self._task_utils = TaskUtils()
 
     @log_function
-    def __get_convert_article_api_data(self, article: Article) -> ArticleApiData:
+    def __get_convert_article_api_data(self, article: Article, cut_title: bool = False) -> ArticleApiData:
         article_data = {
             "title": article.title,
             "media": article.media,
@@ -31,6 +31,8 @@ class APILogic:
             "icon_url": self._media_utils.get_google_article_icon_url(article.media),
             "publishing_time": article.publishing_time
         }
+        if cut_title:
+            article_data["title"] = f"{article.title[:20]}..."
         article_api_object = ArticleApiData(**article_data)
         return article_api_object
 
@@ -84,23 +86,41 @@ class APILogic:
         return similar_articles, title
 
     @log_function
+    def _get_cluster_data_for_api(self, cluster: Cluster) -> dict:
+        articles = []
+        for article_id in cluster.articles_id:
+            article = self._article_utils.get_article_by_id(article_id)
+            article_data = self.__get_convert_article_api_data(article, cut_title=True)
+            articles.append(article_data)
+        data = {
+            "articles": articles,
+            "trend": cluster.trend,
+            "creation_time": cluster.creation_time
+        }
+        return data
+
+    @log_function
     def build_clusters_for_ui(self):
-        clusters: List[Cluster] = self._cluster_utils.get_all_clusters()
-        self.server_logger.debug(f"Got {len(clusters)} clusters")
+        clusters_objects: List[Cluster] = self._cluster_utils.get_all_clusters()
+        self.server_logger.debug(f"Got {len(clusters_objects)} clusters")
+        clusters = []
         nodes = []
         edges = []
         # todo: make `node_limit` and `max_trend_label_index` given as argument from route
         node_limit = 50
         max_trend_label_index = 5
-        clusters = random.sample(clusters, node_limit)
-        for index, cluster in enumerate(clusters):
+        clusters_objects = random.sample(clusters_objects, node_limit)
+        for index, cluster in enumerate(clusters_objects):
             # Create Node
-            nodes.append({"id": index, "label": cluster.trend[:max_trend_label_index], "title": cluster.last_updated})
+            trend_label = cluster.trend[:max_trend_label_index]
+            nodes.append({"id": index, "label": trend_label, "title": cluster.last_updated})
+            clusters.append(self._get_cluster_data_for_api(cluster))
+            # clusters
 
             # Build edges
             # EDGE_LIMIT = 10
             count = 0
-            for other_cluster_index, other_cluster in enumerate(clusters):
+            for other_cluster_index, other_cluster in enumerate(clusters_objects):
                 if index != other_cluster_index:
                     domains_intersection = set(cluster.domains).intersection(set(other_cluster.domains))
                     if len(domains_intersection) > 0 and not self._edge_exists(edges, index, other_cluster_index):
@@ -108,8 +128,7 @@ class APILogic:
                         count += 1
                 # if count > EDGE_LIMIT:
                 #     break
-
-        return nodes, edges
+        return nodes, edges, clusters
 
     @staticmethod
     def _edge_exists(edges: List[dict], idx_node_1: int, idx_node_2: int) -> bool:

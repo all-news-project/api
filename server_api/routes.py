@@ -50,9 +50,10 @@ def get_clusters_for_ui():
     return_data = {"nodes": list(), "edges": list(), "succeeded": False}
     try:
         api_logic = APILogic()
-        nodes, edges = api_logic.build_clusters_for_ui()
+        nodes, edges, clusters = api_logic.build_clusters_for_ui()
         return_data["nodes"] = nodes
         return_data["edges"] = edges
+        return_data["clusters"] = clusters
         return_data["succeeded"] = True
     except Exception as e:
         logger.error(str(e))
